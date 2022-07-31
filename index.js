@@ -10,7 +10,7 @@ const cors = require("cors");
 const bcrypt = require('bcrypt');
 const User = require('./models/User')
 const app = express();
-const port = process.env.port || 6969
+const port = process.env.PORT || 6969
 app.use(express.json());
 app.use(cors());
 
