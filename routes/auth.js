@@ -12,14 +12,17 @@ const fetchuser = require("../middleware/fetchuser")
 router.post("/register", (req, res) => {
     const { name, email, password } = req.body;
     if (!email || !password || !name) {
-        return res.status(400).json({ msg: 'Name, Password and email are required' })
+        return res.status(400).json({ msg: 'Password and email are required' })
     }
     User.findOne({ email })
         .then(async (savedUser) => {
+            let success=false;
             // if already a user exists 
             if (savedUser) {
-                return res.status(422).json({ error: "email already exists" })
+                return res.status(422).json({success, error: "email already exists" })
             }
+
+            
             // if user doen't exists
             const user = new User({
                 email,
@@ -41,17 +44,19 @@ router.post("/register", (req, res) => {
                         }
                     }
                     const authtoken = jwt.sign(data, JWT_SECRET);
-
-                    res.status(200).json(authtoken)
+                    success = true
+                    res.status(200).json({success,authtoken})
                 })
                 .catch((err) => {
                     console.log(err);
+                    res.status(500).send("some error occured")
                 })
+            
 
 
         }).catch((err) => {
             console.log(err);
-            res.status(500).send("some error occured")
+            // res.status(500).send("some error occured")
         })
 
 })
@@ -64,6 +69,7 @@ router.post("/login", (req, res) => {
     }
     User.findOne({ email: email })
         .then((savedUser) => {
+            let success = false;
             console.log(savedUser);
             if (!savedUser) {
                 return res.status(422).json({ error: "invalid email or password" })
@@ -72,7 +78,8 @@ router.post("/login", (req, res) => {
                 bcrypt.compare(req.body.password, savedUser.password)
                     .then((user) => {
                         if (!user) {
-                            res.status(422).send({ msg: "wrong credentials" })
+                            success = false
+                            res.status(422).send({success, msg: "wrong credentials" })
                             
                         } else {
                             const data = {
@@ -83,7 +90,8 @@ router.post("/login", (req, res) => {
 
                             // console.log(data);
                             const authtoken = jwt.sign(data, JWT_SECRET);
-                            res.status(200).send({ authtoken })
+                            success = true;
+                            res.status(200).send({ success, authtoken })
                         }
                     })
                     .catch((err) => {
