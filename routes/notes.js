@@ -69,7 +69,8 @@ router.delete('/deletenote/:id', fetchuser, async (req, res) => {
     try {
         // find the note to be deleted
         let note = await Note.findOneAndUpdate({
-            userId:req.user.id}, {
+            user:req.user.id,"notes._id":req.params.id
+            }, {
             $pull: {
                 notes: { _id: req.params.id }
             }
