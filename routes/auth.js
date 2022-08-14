@@ -1,5 +1,6 @@
 const express = require('express');
 const User = require('../models/User');
+const Note = require('../models/Note')
 const router = express.Router();
 const bcrypt = require('bcrypt');
 var jwt = require('jsonwebtoken');
@@ -52,6 +53,16 @@ router.post("/register", (req, res) => {
                     res.status(500).send("some error occured")
                 })
             
+            // creating a notes schema for the user 
+            const note = new Note({
+                user:user.id,
+                notes:{
+                    title:"Welcome",
+                    description:"Write your notes here"
+                }
+            })
+
+            note.save();
 
 
         }).catch((err) => {
